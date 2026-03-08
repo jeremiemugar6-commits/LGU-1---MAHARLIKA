@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LGU 1 - Maharlika | Integrated Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --forest: #0f3d2a;
+    --emerald: #1a6642;
+    --jade: #25895a;
+    --mint: #4abe84;
+    --pale: #e8f7ef;
+    --cream: #f5fbf7;
+    --white: #ffffff;
+    --text: #0d2b1d;
+    --muted: #5a7a69;
+    --border: #c5e4d3;
+    --warn-bg: #fffbeb;
+    --warn-border: #f59e0b;
+    --danger-bg: #fff1f2;
+    --danger-border: #e11d48;
+    --info-bg: #f0fdf9;
+    --info-border: #14b8a6;
+    --sidebar-w: 260px;
+    --header-h: 64px;
+    --radius: 12px;
+    --shadow: 0 2px 12px rgba(15,61,42,0.08);
+    --shadow-lg: 0 8px 32px rgba(15,61,42,0.14);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Outfit', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ========== AUTH ========== */
+  .auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--forest);
+    background-image:
+      radial-gradient(ellipse at 20% 50%, rgba(37,137,90,0.3) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 20%, rgba(26,102,66,0.4) 0%, transparent 55%);
+    padding: 1rem;
+  }
+
+  .auth-card {
+    background: var(--white);
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.35);
+    animation: authReveal 0.5s ease both;
+  }
+
+  @keyframes authReveal {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .auth-logo {
+    text-align: center;
+    margin-bottom: 1.8rem;
+  }
+
+  .auth-logo .seal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 0.8rem;
+  }
+
+  .auth-logo .seal img {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(15,61,42,0.2));
+  }
+
+  .auth-logo h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--forest);
+    line-height: 1.2;
+  }
+
+  .auth-logo p {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 0.2rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .form-group {
+    margin-bottom: 1rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 0.4rem;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    background: var(--cream);
+    color: var(--text);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+
+  .form-group input:focus {
+    border-color: var(--jade);
+    box-shadow: 0 0 0 3px rgba(37,137,90,0.12);
+  }
+
+  .btn-primary {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--forest);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    letter-spacing: 0.02em;
+    margin-top: 0.5rem;
+  }
+
+  .btn-primary:hover { background: var(--emerald); transform: translateY(-1px); }
+  .btn-primary:active { transform: translateY(0); }
+
+  .auth-link {
+    background: none;
+    border: none;
+    color: var(--jade);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.83rem;
+    cursor: pointer;
+    margin-top: 0.9rem;
+    display: block;
+    text-align: center;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .auth-link:hover { color: var(--forest); }
+
+  .msg-error { color: #dc2626; font-size: 0.8rem; margin-top: 0.6rem; text-align: center; }
+  .msg-success { color: #16a34a; font-size: 0.8rem; margin-top: 0.6rem; text-align: center; }
+
+  /* ========== APP SHELL ========== */
+  #app { display: none; min-height: 100vh; }
+
+  /* SIDEBAR */
+  .sidebar {
+    position: fixed;
+    top: 0; left: 0;
+    width: var(--sidebar-w);
+    height: 100vh;
+    background: var(--forest);
+    display: flex;
+    flex-direction: column;
+    z-index: 200;
+    transition: transform 0.3s ease;
+    overflow-y: auto;
+  }
+
+  .sidebar-header {
+    padding: 1.4rem 1.2rem 1rem;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+  }
+
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .sidebar-seal {
+    width: 40px; height: 40px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+
+  .sidebar-brand-text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 0.95rem;
+    color: white;
+    line-height: 1.2;
+  }
+
+  .sidebar-brand-text p {
+    font-size: 0.68rem;
+    color: rgba(255,255,255,0.5);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .sidebar-nav {
+    flex: 1;
+    padding: 1rem 0;
+  }
+
+  .nav-section-label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.35);
+    padding: 0.8rem 1.2rem 0.3rem;
+  }
+
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.65rem 1.2rem;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.87rem;
+    font-weight: 400;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 0;
+    text-decoration: none;
+    border-left: 3px solid transparent;
+  }
+
+  .nav-item:hover {
+    background: rgba(255,255,255,0.07);
+    color: white;
+    border-left-color: rgba(255,255,255,0.3);
+  }
+
+  .nav-item.active {
+    background: rgba(74,190,132,0.18);
+    color: var(--mint);
+    border-left-color: var(--mint);
+    font-weight: 600;
+  }
+
+  .nav-icon { font-size: 1rem; flex-shrink: 0; }
+
+  .sidebar-footer {
+    padding: 1rem 1.2rem;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
+  }
+
+  .user-row {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .user-avatar {
+    width: 34px; height: 34px;
+    background: var(--jade);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.85rem;
+    color: white;
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+
+  .user-info h4 {
+    font-size: 0.82rem;
+    color: white;
+    font-weight: 600;
+  }
+
+  .user-info p {
+    font-size: 0.7rem;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .btn-logout {
+    width: 100%;
+    padding: 0.55rem;
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 7px;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-logout:hover { background: rgba(255,255,255,0.14); color: white; }
+
+  /* TOPBAR */
+  .topbar {
+    position: fixed;
+    top: 0;
+    left: var(--sidebar-w);
+    right: 0;
+    height: var(--header-h);
+    background: var(--white);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 1.5rem;
+    gap: 1rem;
+    z-index: 100;
+    box-shadow: 0 1px 8px rgba(15,61,42,0.06);
+  }
+
+  .menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.3rem;
+    color: var(--text);
+    font-size: 1.3rem;
+    line-height: 1;
+  }
+
+  .topbar-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.1rem;
+    color: var(--forest);
+  }
+
+  .topbar-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+  }
+
+  .badge-notif {
+    position: relative;
+    background: var(--pale);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.4rem 0.7rem;
+    font-size: 0.8rem;
+    color: var(--emerald);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .badge-dot {
+    position: absolute;
+    top: -4px; right: -4px;
+    width: 9px; height: 9px;
+    background: #e11d48;
+    border-radius: 50%;
+    border: 2px solid white;
+  }
+
+  .topbar-date {
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: none;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    margin-left: var(--sidebar-w);
+    margin-top: var(--header-h);
+    padding: 1.8rem;
+    min-height: calc(100vh - var(--header-h));
+  }
+
+  /* PAGE */
+  .page { display: none; }
+  .page.active { display: block; animation: pageIn 0.3s ease both; }
+
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SECTION HEADING */
+  .section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .section-heading h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
+    color: var(--forest);
+  }
+
+  .section-heading p {
+    font-size: 0.82rem;
+    color: var(--muted);
+    margin-top: 0.1rem;
+  }
+
+  /* STAT CARDS */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .stat-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    transition: box-shadow 0.2s, transform 0.2s;
+  }
+
+  .stat-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-2px); }
+
+  .stat-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  .stat-icon.green { background: rgba(74,190,132,0.15); }
+  .stat-icon.blue { background: rgba(59,130,246,0.12); }
+  .stat-icon.amber { background: rgba(245,158,11,0.12); }
+  .stat-icon.red { background: rgba(225,29,72,0.1); }
+
+  .stat-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--forest);
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.76rem;
+    color: var(--muted);
+    margin-top: 0.15rem;
+  }
+
+  /* DEPT GRID */
+  .dept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.8rem;
+  }
+
+  .dept-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.2rem;
+    cursor: pointer;
+    transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .dept-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+    background: var(--jade);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .dept-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-3px); border-color: var(--jade); }
+  .dept-card:hover::before { opacity: 1; }
+
+  .dept-icon {
+    font-size: 1.4rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .dept-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    line-height: 1.3;
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.2rem 0.65rem;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+  }
+
+  .status-pill::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  .pill-active { background: rgba(22,163,74,0.1); color: #15803d; }
+  .pill-monitoring { background: rgba(234,179,8,0.12); color: #a16207; }
+  .pill-standby { background: rgba(107,114,128,0.1); color: #4b5563; }
+
+  /* ALERT PANEL */
+  .panel {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 1.4rem;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    padding: 0.9rem 1.2rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .panel-header h3 {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--forest);
+  }
+
+  .panel-body { padding: 1rem 1.2rem; }
+
+  .alert-item {
+    display: flex;
+    gap: 0.8rem;
+    align-items: flex-start;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.6rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .alert-item:last-child { margin-bottom: 0; }
+
+  .alert-item.warn { background: var(--warn-bg); border-left: 3px solid var(--warn-border); }
+  .alert-item.danger { background: var(--danger-bg); border-left: 3px solid var(--danger-border); }
+  .alert-item.info { background: var(--info-bg); border-left: 3px solid var(--info-border); }
+
+  .alert-dot { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+
+  .alert-text strong { display: block; font-weight: 600; color: var(--text); }
+  .alert-text span { color: var(--muted); font-size: 0.8rem; }
+
+  /* ACTIVITY LOG */
+  .log-list { list-style: none; }
+
+  .log-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.8rem;
+    padding: 0.7rem 0;
+    border-bottom: 1px solid var(--pale);
+    font-size: 0.85rem;
+  }
+
+  .log-item:last-child { border-bottom: none; }
+
+  .log-time {
+    font-size: 0.72rem;
+    color: var(--muted);
+    white-space: nowrap;
+    margin-top: 2px;
+    min-width: 54px;
+  }
+
+  .log-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--mint);
+    flex-shrink: 0;
+    margin-top: 4px;
+  }
+
+  .log-text { color: var(--text); }
+  .log-dept { color: var(--jade); font-weight: 600; }
+
+  /* NOTIFICATION LIST */
+  .notif-list { list-style: none; }
+
+  .notif-item {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid var(--pale);
+    font-size: 0.85rem;
+    color: var(--text);
+  }
+
+  .notif-item:last-child { border-bottom: none; }
+  .notif-icon { font-size: 1rem; }
+
+  /* SIDEBAR OVERLAY */
+  .sidebar-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 150;
+  }
+
+  /* ==============================
+     RESPONSIVE
+  ================================ */
+  @media (max-width: 1100px) {
+    .stats-row { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (max-width: 900px) {
+    :root { --sidebar-w: 0px; }
+
+    .sidebar {
+      width: 260px;
+      transform: translateX(-100%);
+    }
+
+    .sidebar.open {
+      transform: translateX(0);
+    }
+
+    .sidebar-overlay.open { display: block; }
+
+    .topbar {
+      left: 0;
+    }
+
+    .menu-toggle { display: block; }
+
+    .topbar-date { display: block; }
+
+    .main {
+      margin-left: 0;
+      padding: 1.2rem 1rem;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .stats-row { grid-template-columns: 1fr 1fr; }
+    .dept-grid { grid-template-columns: 1fr 1fr; }
+    .auth-card { padding: 2rem 1.4rem; }
+    .main { padding: 1rem 0.85rem; }
+    .section-heading h2 { font-size: 1.1rem; }
+  }
+
+  @media (max-width: 400px) {
+    .stats-row { grid-template-columns: 1fr; }
+    .dept-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div class="auth-screen" id="authScreen">
+  <div id="loginWrap">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="seal"><img src="maharlika-logo.png" alt="Maharlika Logo"></div>
+        <h2>LGU 1 — Maharlika</h2>
+        <p>Integrated Management System</p>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="loginUser" placeholder="Enter username" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="loginPass" placeholder="Enter password" autocomplete="current-password">
+      </div>
+      <button class="btn-primary" onclick="login()">Sign In</button>
+      <button class="auth-link" onclick="showReg()">No account yet? Register here</button>
+      <p class="msg-error" id="loginErr"></p>
+    </div>
+  </div>
+
+  <div id="regWrap" style="display:none">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="seal"><img src="maharlika-logo.png" alt="Maharlika Logo"></div>
+        <h2>Create Account</h2>
+        <p>LGU Maharlika IMS</p>
+      </div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="regUser" placeholder="Choose a username">
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="regPass" placeholder="Choose a password">
+      </div>
+      <button class="btn-primary" onclick="register()">Create Account</button>
+      <button class="auth-link" onclick="showLogin()">Already have an account? Sign in</button>
+      <p class="msg-error" id="regErr"></p>
+      <p class="msg-success" id="regOk"></p>
+    </div>
+  </div>
+</div>
+
+<!-- SIDEBAR OVERLAY -->
+<div class="sidebar-overlay" id="overlay" onclick="closeSidebar()"></div>
+
+<!-- APP SHELL -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="sidebar-seal">🏛️</div>
+        <div class="sidebar-brand-text">
+          <h1>LGU Maharlika</h1>
+          <p>IMS v2.0</p>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" onclick="showPage('dashboard', this)">
+        <span class="nav-icon">📊</span> Dashboard
+      </div>
+
+      <div class="nav-section-label">Departments</div>
+      <div class="nav-item" onclick="showPage('barangay', this)">
+        <span class="nav-icon">🏘️</span> Barangay Management
+      </div>
+      <div class="nav-item" onclick="showPage('health', this)">
+        <span class="nav-icon">🏥</span> Health & Social Welfare
+      </div>
+      <div class="nav-item" onclick="showPage('revenue', this)">
+        <span class="nav-icon">💰</span> Revenue & Tax
+      </div>
+      <div class="nav-item" onclick="showPage('business', this)">
+        <span class="nav-icon">🏢</span> Business Permits
+      </div>
+      <div class="nav-item" onclick="showPage('disaster', this)">
+        <span class="nav-icon">🚨</span> Disaster Response
+      </div>
+      <div class="nav-item" onclick="showPage('senior', this)">
+        <span class="nav-icon">👴</span> Senior Citizens
+      </div>
+      <div class="nav-item" onclick="showPage('election', this)">
+        <span class="nav-icon">🗳️</span> Election Management
+      </div>
+      <div class="nav-item" onclick="showPage('market', this)">
+        <span class="nav-icon">🛒</span> Public Market
+      </div>
+
+      <div class="nav-section-label">System</div>
+      <div class="nav-item" onclick="showPage('settings', this)">
+        <span class="nav-icon">⚙️</span> Settings
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="user-row">
+        <div class="user-avatar" id="userAvatar">S</div>
+        <div class="user-info">
+          <h4 id="userNameDisplay">Super</h4>
+          <p id="userRoleDisplay">Super Admin</p>
+        </div>
+      </div>
+      <button class="btn-logout" onclick="logout()">🚪 Sign Out</button>
+    </div>
+  </aside>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+    <span class="topbar-title" id="topbarTitle">Dashboard</span>
+    <div class="topbar-right">
+      <span class="topbar-date" id="topbarDate"></span>
+      <div class="badge-notif" onclick="showPage('dashboard', document.querySelector('.nav-item'))">
+        🔔 3
+        <span class="badge-dot"></span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- DASHBOARD PAGE -->
+    <div class="page active" id="page-dashboard">
+      <div class="section-heading">
+        <div>
+          <h2>Good morning, Maharlika 👋</h2>
+          <p>Here's your integrated management overview for today.</p>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon green">🏘️</div>
+          <div>
+            <div class="stat-val">8</div>
+            <div class="stat-label">Active Departments</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon blue">📋</div>
+          <div>
+            <div class="stat-val">124</div>
+            <div class="stat-label">Pending Transactions</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon amber">⚠️</div>
+          <div>
+            <div class="stat-val">3</div>
+            <div class="stat-label">Active Alerts</div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon red">🚨</div>
+          <div>
+            <div class="stat-val">1</div>
+            <div class="stat-label">Monitoring</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DEPT CARDS -->
+      <div class="section-heading"><div><h2>Departments</h2><p>Click any department to view details</p></div></div>
+      <div class="dept-grid" id="deptGrid"></div>
+
+      <!-- TWO-COL PANELS -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.2rem;margin-bottom:1.4rem;" id="panelRow">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>🔔 Cross-Dept Alerts</h3>
+            <span style="font-size:0.75rem;color:var(--muted)">Live</span>
+          </div>
+          <div class="panel-body">
+            <div class="alert-item warn">
+              <span class="alert-dot">⚠️</span>
+              <div class="alert-text">
+                <strong>Budget Review Due</strong>
+                <span>Revenue & Tax — submit by Friday</span>
+              </div>
+            </div>
+            <div class="alert-item danger">
+              <span class="alert-dot">🔴</span>
+              <div class="alert-text">
+                <strong>Disaster Monitoring Active</strong>
+                <span>Tropical depression advisory in effect</span>
+              </div>
+            </div>
+            <div class="alert-item info">
+              <span class="alert-dot">ℹ️</span>
+              <div class="alert-text">
+                <strong>Business Permit Renewal</strong>
+                <span>Q1 deadline in 14 days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>📋 Module Notifications</h3>
+            <span style="font-size:0.75rem;color:var(--muted)">Today</span>
+          </div>
+          <div class="panel-body">
+            <ul class="notif-list">
+              <li class="notif-item"><span class="notif-icon">💊</span> 18 health clearances pending approval</li>
+              <li class="notif-item"><span class="notif-icon">🧓</span> Senior citizen ID renewal queue: 42</li>
+              <li class="notif-item"><span class="notif-icon">🏪</span> 7 new business permit applications</li>
+              <li class="notif-item"><span class="notif-icon">🗳️</span> Election module: next cycle in 180 days</li>
+              <li class="notif-item"><span class="notif-icon">🛒</span> Market stall payments: 12 overdue</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <h3>📜 Recent Activity Log</h3>
+          <span style="font-size:0.75rem;color:var(--muted)">Last 24 hours</span>
+        </div>
+        <div class="panel-body">
+          <ul class="log-list">
+            <li class="log-item">
+              <span class="log-dot"></span>
+              <span class="log-time">08:14</span>
+              <span class="log-text"><span class="log-dept">Health</span> — 3 residents registered for immunization</span>
+            </li>
+            <li class="log-item">
+              <span class="log-dot"></span>
+              <span class="log-time">07:52</span>
+              <span class="log-text"><span class="log-dept">Revenue</span> — ₱84,200 collected in real property tax</span>
+            </li>
+            <li class="log-item">
+              <span class="log-dot"></span>
+              <span class="log-time">07:31</span>
+              <span class="log-text"><span class="log-dept">Business</span> — Permit #2024-0198 issued to Dela Cruz Trading</span>
+            </li>
+            <li class="log-item">
+              <span class="log-dot"></span>
+              <span class="log-time">06:55</span>
+              <span class="log-text"><span class="log-dept">Disaster</span> — Alert Level 1 activated for Barangay 4</span>
+            </li>
+            <li class="log-item">
+              <span class="log-dot"></span>
+              <span class="log-time">06:20</span>
+              <span class="log-text"><span class="log-dept">Senior</span> — Monthly pension release: 203 beneficiaries processed</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div><!-- end dashboard page -->
+
+    <!-- GENERIC DEPT PAGES -->
+    <div class="page" id="page-barangay"><div class="section-heading"><div><h2>🏘️ Barangay Management</h2><p>Manage barangay records, residents, and local governance.</p></div></div><div class="panel"><div class="panel-body" style="padding:2rem;text-align:center;color:var(--muted)">Module content for Barangay Management will appear here.</div></div></div>
+    <div class="page" id="page-health"><div class="section-heading"><div><h2>🏥 Health & Social Welfare</h2><p>Track health programs, clearances, and social welfare services.</p></div></div><div class="panel"><div class="panel-body" style="padding:2rem;text-align:center;color:var(--muted)">Module content for Health & Social Welfare will appear here.</div></div></div>
+    <div class="page" id="page-revenue"><div class="section-heading"><div><h2>💰 Revenue & Tax</h2><p>Monitor tax collections, real property records, and financial summaries.</p></div></div><div class="panel"><div class="panel-body" style="padding:2rem;text-align:center;color:var(--muted)">Module content for Revenue & Tax will appear here.</div></div></div>
+    <div class="page" id="page-business"><div class="section-heading"><div><h2>🏢 Business Permits & Licensing</h2><p>Process and track business permit applications and renewals.</p></div></div><div class="panel"><div class="panel-body" style="padding:2rem;text-align:center;color:var(--muted)">Module content for Business Permits will appear here.</div></div></div>
+    <div class="page" id="page-disaster">
+      <div class="section-heading">
+        <div>
+          <h2>🚨 Disaster Response &amp; Solid Waste Management</h2>
+          <p>Integrated disaster response, emergency reporting, and waste collection operations.</p>
+        </div>
+        <a href="maharlika-system.html" target="_blank" style="font-size:0.78rem;color:var(--jade);text-decoration:none;border:1px solid var(--border);padding:0.4rem 0.8rem;border-radius:6px;font-weight:600;white-space:nowrap;">↗ Open Full Screen</a>
+      </div>
+      <div style="border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);">
+        <iframe
+          src="maharlika-system.html"
+          id="disaster-iframe"
+          style="width:100%;height:calc(100vh - 185px);min-height:600px;border:none;display:block;"
+          title="Disaster Response & Waste Management System"
+          loading="lazy"
+        ></iframe>
+      </div>
+    </div>
+    <div class="page" id="page-senior"><div class="section-heading"><div><h2>👴 Senior Citizen Office</h2><p>ID management, pension tracking, and senior citizen services.</p></div></div><div class="panel"><div class="panel-body" style="padding:2rem;text-align:center;color:var(--muted)">Module content for Senior Citizens will appear here.</div></div></div>
+    <div class="page" id="page-election"><div class="section-heading"><div><h2>🗳️ Election Management</h2><p>Voter records, election calendar, and precinct management.</p></div></div><div class="panel"><div class="panel-body" style="padding:2rem;text-align:center;color:var(--muted)">Module content for Election Management will appear here.</div></div></div>
+    <div class="page" id="page-market"><div class="section-heading"><div><h2>🛒 Public Market</h2><p>Stall assignments, market fees, and vendor management.</p></div></div><div class="panel"><div class="panel-body" style="padding:2rem;text-align:center;color:var(--muted)">Module content for Public Market will appear here.</div></div></div>
+    <div class="page" id="page-settings"><div class="section-heading"><div><h2>⚙️ Settings</h2><p>Manage system preferences and user accounts.</p></div></div><div class="panel"><div class="panel-body" style="padding:2rem;text-align:center;color:var(--muted)">System settings will appear here.</div></div></div>
+
+  </main>
+</div>
+
+<script>
+  // ---- AUTH ----
+  const users = [{ username: "super", password: "admin", role: "Super Admin" }];
+
+  function showReg() {
+    document.getElementById('loginWrap').style.display = 'none';
+    document.getElementById('regWrap').style.display = 'block';
+  }
+
+  function showLogin() {
+    document.getElementById('regWrap').style.display = 'none';
+    document.getElementById('loginWrap').style.display = 'block';
+  }
+
+  function register() {
+    const u = document.getElementById('regUser').value.trim();
+    const p = document.getElementById('regPass').value;
+    const err = document.getElementById('regErr');
+    const ok = document.getElementById('regOk');
+    err.textContent = ''; ok.textContent = '';
+    if (!u || !p) { err.textContent = 'All fields are required.'; return; }
+    if (users.find(x => x.username === u)) { err.textContent = 'Username already exists.'; return; }
+    users.push({ username: u, password: p, role: 'User' });
+    ok.textContent = 'Account created! You can now sign in.';
+    document.getElementById('regUser').value = '';
+    document.getElementById('regPass').value = '';
+  }
+
+  function login() {
+    const u = document.getElementById('loginUser').value.trim();
+    const p = document.getElementById('loginPass').value;
+    const err = document.getElementById('loginErr');
+    err.textContent = '';
+    const user = users.find(x => x.username === u && x.password === p);
+    if (!user) { err.textContent = 'Invalid username or password.'; return; }
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('userNameDisplay').textContent = user.username.charAt(0).toUpperCase() + user.username.slice(1);
+    document.getElementById('userRoleDisplay').textContent = user.role;
+    document.getElementById('userAvatar').textContent = user.username.charAt(0).toUpperCase();
+    loadDeptGrid();
+    updateDate();
+  }
+
+  function logout() {
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('loginUser').value = '';
+    document.getElementById('loginPass').value = '';
+    document.getElementById('loginErr').textContent = '';
+    closeSidebar();
+  }
+
+  // ---- NAVIGATION ----
+  function showPage(id, navEl) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    const pg = document.getElementById('page-' + id);
+    if (pg) pg.classList.add('active');
+
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    if (navEl) navEl.classList.add('active');
+
+    const titles = {
+      dashboard: 'Dashboard', barangay: 'Barangay Management',
+      health: 'Health & Social Welfare', revenue: 'Revenue & Tax',
+      business: 'Business Permits', disaster: 'Disaster Response',
+      senior: 'Senior Citizens', election: 'Election Management',
+      market: 'Public Market', settings: 'Settings'
+    };
+    document.getElementById('topbarTitle').textContent = titles[id] || id;
+
+    // Reload disaster iframe each time it's opened so it's always fresh
+    if (id === 'disaster') {
+      const iframe = document.getElementById('disaster-iframe');
+      if (iframe && !iframe.getAttribute('data-loaded')) {
+        iframe.src = 'maharlika-system.html';
+        iframe.setAttribute('data-loaded', '1');
+      }
+    }
+
+    closeSidebar();
+  }
+
+  // ---- SIDEBAR MOBILE ----
+  function toggleSidebar() {
+    document.getElementById('sidebar').classList.toggle('open');
+    document.getElementById('overlay').classList.toggle('open');
+  }
+
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+  }
+
+  // ---- DEPT GRID ----
+  const depts = [
+    { id: 'barangay', name: 'Barangay Management', status: 'Active', icon: '🏘️' },
+    { id: 'health', name: 'Health & Social Welfare', status: 'Active', icon: '🏥' },
+    { id: 'revenue', name: 'Revenue & Tax', status: 'Active', icon: '💰' },
+    { id: 'business', name: 'Business Permits & Licensing', status: 'Active', icon: '🏢' },
+    { id: 'disaster', name: 'Disaster Response', status: 'Monitoring', icon: '🚨' },
+    { id: 'senior', name: 'Senior Citizen Office', status: 'Active', icon: '👴' },
+    { id: 'election', name: 'Election Management', status: 'Standby', icon: '🗳️' },
+    { id: 'market', name: 'Public Market', status: 'Active', icon: '🛒' },
+  ];
+
+  const pillClass = { Active: 'pill-active', Monitoring: 'pill-monitoring', Standby: 'pill-standby' };
+
+  function loadDeptGrid() {
+    const grid = document.getElementById('deptGrid');
+    grid.innerHTML = '';
+    depts.forEach(d => {
+      const card = document.createElement('div');
+      card.className = 'dept-card';
+      card.innerHTML = `
+        <div class="dept-icon">${d.icon}</div>
+        <div class="dept-name">${d.name}</div>
+        <span class="status-pill ${pillClass[d.status]}">${d.status}</span>
+      `;
+      card.onclick = () => {
+        const navEl = [...document.querySelectorAll('.nav-item')].find(el => el.textContent.trim().includes(d.icon));
+        showPage(d.id, navEl);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      };
+      grid.appendChild(card);
+    });
+  }
+
+  // ---- DATE ----
+  function updateDate() {
+    const now = new Date();
+    document.getElementById('topbarDate').textContent = now.toLocaleDateString('en-PH', { weekday: 'short', month: 'short', day: 'numeric' });
+  }
+
+  // ---- RESPONSIVE PANEL ROW ----
+  function checkPanelLayout() {
+    const row = document.getElementById('panelRow');
+    if (!row) return;
+    if (window.innerWidth < 700) {
+      row.style.gridTemplateColumns = '1fr';
+    } else {
+      row.style.gridTemplateColumns = '1fr 1fr';
+    }
+  }
+
+  window.addEventListener('resize', checkPanelLayout);
+  checkPanelLayout();
+</script>
+</body>
+</html>
